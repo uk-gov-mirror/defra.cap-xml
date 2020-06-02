@@ -11,7 +11,7 @@ provider:
   region: ${env:TARGET_REGION}
   deploymentBucket:
     name: ${env:SLS_BUCKET}
-    serverSideEncryption: SSE-KMS
+    serverSideEncryption: aws:kms
   vpc:
     securityGroupIds:
       - ${env:SLS_VPN_SECURITY_GROUP}
