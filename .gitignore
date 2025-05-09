@@ -9,3 +9,5 @@ config/config.json
 .vscode
 
 lcov.info
+
+docker/.volume
