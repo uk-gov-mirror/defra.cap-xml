@@ -84,6 +84,18 @@ get_request_parameters() {
   return
 }
 
+get_response_models() {
+  case $lambda_function_name in
+    getMessage|getMessagesAtom)
+      echo  --response-models '{"application/xml":\u0020"Empty"}'
+    ;;
+    processMessage)
+      echo  --response-models '{"application/json":\u0020"Empty"}'
+    ;;
+  esac
+  return
+}
+
 put_integration() {
 
   # Due to unresolved shell expansion issues integration request templates need to be hardcoded rather than being returned 
@@ -102,7 +114,7 @@ put_integration() {
         --content-handling CONVERT_TO_TEXT \
         --request-templates '{"application/json": "{\"pathParameters\": { \"id\": \"$input.params(\"id\")\"}}", "application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
 
-      put_integration_responses_for_get_message
+      put_responses_for_get_message
       ;;
     getMessagesAtom)
       awslocal apigateway put-integration \
@@ -115,7 +127,7 @@ put_integration() {
         --passthrough-behavior WHEN_NO_MATCH \
         --content-handling CONVERT_TO_TEXT
 
-      put_integration_responses_for_get_messages_atom
+      put_responses_for_get_messages_atom
       ;;
     processMessage)
       awslocal apigateway put-integration \
@@ -129,7 +141,7 @@ put_integration() {
         --content-handling CONVERT_TO_TEXT \
         --request-templates '{"text/html": "{\"bodyXml\": $input.json(\"$.message\")}", "application/json": "$input.body"}'
 
-      put_integration_response_for_http_500
+      put_responses_for_process_message
       ;;
 
   esac
@@ -137,12 +149,35 @@ put_integration() {
   return
 }
 
-put_integration_responses_for_get_message() {
+put_method_response_for_http_200_status_code() {
+  # Due to unresolved shell expansion issues integration response models need to be hardcoded rather than being returned
+  # by a function. This results in some duplication.
+  case $lambda_function_name in
+    getMessage|getMessagesAtom)
+     awslocal apigateway put-method-response \
+       --rest-api-id $cap_xml_rest_api_id \
+       --resource-id $resource_id \
+       --http-method $http_method \
+       --status-code 200 \
+       --response-models '{"application/xml": "Empty"}'
+    ;;
+    processMessage)
+      awslocal apigateway put-method-response \
+        --rest-api-id $cap_xml_rest_api_id \
+        --resource-id $resource_id \
+        --http-method $http_method \
+        --status-code 200 \
+        --response-models '{"application/json": "Empty"}'
+    ;;
+  esac
+}
+
+put_responses_for_get_message() {
   
-   # Due to unresolved shell expansion issues integration response templates need to be hardcoded rather than being returned 
+  # Due to unresolved shell expansion issues integration response templates need to be hardcoded rather than being returned 
   # by a function. This results in some duplication.
 
-  put_integration_response_for_http_200_get
+  put_responses_for_http_200_get
 
   awslocal apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
@@ -155,24 +190,27 @@ put_integration_responses_for_get_message() {
   put_integration_response_for_http_500
 }
 
-put_integration_responses_for_get_messages_atom() {
-   put_integration_response_for_http_200_get
+put_responses_for_get_messages_atom() {
+   put_responses_for_http_200_get
    put_integration_response_for_http_500
 }
 
-put_integration_responses_for_process_message() {
+put_responses_for_process_message() {
+  put_method_response_for_http_200_status_code
   put_integration_response_for_http_500
 }
 
- put_integration_response_for_http_200_get() {
+put_responses_for_http_200_get() {
+
+  put_method_response_for_http_200_status_code
 
   awslocal apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
     --resource-id $resource_id \
     --http-method $http_method \
-    --status-code 404 \
-    --selection-pattern 'No message found' \
-    --response-templates  '{"application/json": "{\"errorMessage\": $input.json(\"$.errorMessage\")}"}'
+    --status-code 200 \
+    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
+    --response-templates  '{"application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
 }
 
 put_integration_response_for_http_500() {
