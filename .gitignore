@@ -5,9 +5,6 @@ jspm_packages
 #config
 config/config.json
 
-#VSC
-.vscode
-
 lcov.info
 
 docker/.volume

@@ -26,7 +26,7 @@ for lambda_function in "$lambda_functions_dir"/*; do
         --runtime nodejs20.x \
         --timeout $LAMBDA_TIMEOUT \
         --role arn:aws:iam::000000000000:role/lambda-role \
-        --handler lib/functions/$function_name.handler \
+        --handler lib/functions/$function_name.$function_name \
         --environment "Variables={$custom_environment_variables}" \
         --no-cli-pager
       sleep 1

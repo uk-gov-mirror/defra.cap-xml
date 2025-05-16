@@ -84,18 +84,6 @@ get_request_parameters() {
   return
 }
 
-get_response_models() {
-  case $lambda_function_name in
-    getMessage|getMessagesAtom)
-      echo  --response-models '{"application/xml":\u0020"Empty"}'
-    ;;
-    processMessage)
-      echo  --response-models '{"application/json":\u0020"Empty"}'
-    ;;
-  esac
-  return
-}
-
 put_integration() {
 
   # Due to unresolved shell expansion issues integration request templates need to be hardcoded rather than being returned 
@@ -109,7 +97,7 @@ put_integration() {
         --http-method $http_method \
         --type AWS \
         --integration-http-method POST \
-        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:awSs:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
+        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
         --passthrough-behavior WHEN_NO_TEMPLATES \
         --content-handling CONVERT_TO_TEXT \
         --request-templates '{"application/json": "{\"pathParameters\": { \"id\": \"$input.params(\"id\")\"}}", "application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
@@ -123,7 +111,7 @@ put_integration() {
         --http-method $http_method \
         --type AWS \
         --integration-http-method POST \
-        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:awSs:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
+        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
         --passthrough-behavior WHEN_NO_MATCH \
         --content-handling CONVERT_TO_TEXT
 
@@ -136,10 +124,10 @@ put_integration() {
         --http-method $http_method \
         --type AWS \
         --integration-http-method POST \
-        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:awSs:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
+        --uri arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:000000000000:function:$lambda_function_name/invocations \
         --passthrough-behavior WHEN_NO_TEMPLATES \
         --content-handling CONVERT_TO_TEXT \
-        --request-templates '{"text/html": "{\"bodyXml\": $input.json(\"$.message\")}", "application/json": "$input.body"}'
+        --request-templates '{"text/html": "{\"bodyXml\": $input.json(\"$.message\")}", "text/xml": "{\"bodyXml\": $input.json(\"$.message\")}"}'
 
       put_responses_for_process_message
       ;;
@@ -185,17 +173,24 @@ put_responses_for_get_message() {
     --http-method $http_method \
     --status-code 404 \
     --selection-pattern 'No message found' \
+    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
     --response-templates  '{"application/json": "{\"errorMessage\": $input.json(\"$.errorMessage\")}"}'
 
   put_integration_response_for_http_500
 }
 
 put_responses_for_get_messages_atom() {
-   put_responses_for_http_200_get
-   put_integration_response_for_http_500
+  put_responses_for_http_200_get
+  put_integration_response_for_http_500
 }
 
 put_responses_for_process_message() {
+  awslocal apigateway put-integration-response \
+    --rest-api-id $cap_xml_rest_api_id \
+    --resource-id $resource_id \
+    --http-method $http_method \
+    --status-code 200
+
   put_method_response_for_http_200_status_code
   put_integration_response_for_http_500
 }
@@ -210,7 +205,7 @@ put_responses_for_http_200_get() {
     --http-method $http_method \
     --status-code 200 \
     --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
-    --response-templates  '{"application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
+    --response-templates '{"application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
 }
 
 put_integration_response_for_http_500() {
@@ -220,6 +215,7 @@ put_integration_response_for_http_500() {
     --resource-id $resource_id \
     --http-method $http_method \
     --status-code 500 \
+    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
     --response-templates '{"application/json": "{\"errorMessage\": $input.json(\"$.errorMessage\")}"}' \
     --selection-pattern '(\n|.)+'
 }
