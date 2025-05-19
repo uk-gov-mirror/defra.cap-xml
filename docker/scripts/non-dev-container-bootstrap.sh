@@ -12,4 +12,5 @@ docker/scripts/initialize-command.sh
 docker compose -f docker/infrastructure.yml -f docker/networks.yml -f docker/dev-tools.yml up -d
 docker/scripts/register-lambda-functions.sh
 docker/scripts/register-api-gateway.sh
+docker/scripts/update-config.sh
 docker rm docker-liquibase-1

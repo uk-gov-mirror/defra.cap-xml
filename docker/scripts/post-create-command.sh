@@ -8,6 +8,7 @@ docker/scripts/setup-aws-cli-command-completion.sh
 docker/scripts/init-npm.sh
 docker/scripts/register-lambda-functions.sh
 docker/scripts/register-api-gateway.sh
+docker/scripts/update-config.sh
 
 if [ -d /opt/workspaces/cap-xml/docker ]; then
   # Ensure that docker directory contents can be modified from within the development container.
