@@ -35,3 +35,7 @@ for lambda_function in "$lambda_functions_dir"/*; do
 done
 
 echo "All Lambda functions have been registered with LocalStack."
+
+awslocal lambda create-function-url-config --function-name archiveMessages --auth-type NONE
+
+echo "Created function URL config for archiveMessages function"
