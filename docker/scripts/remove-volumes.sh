@@ -3,8 +3,8 @@ set -e
 
 docker volume rm -f pgadmin pgdata vscode pgbootstrap pgtmp liquibase
 
-CAP_XML_VOLUME=$(docker volume ls -q -f "name=capxml")
+CAP_XML_VOLUME=$(docker volume ls -q -f "name=cap-xml")
 
 if [ ! -z "$CAP_XML_VOLUME" ]; then
-  docker volume rm -f $(docker volume ls -f name=capxml --format json | jq -r .Name)
+  docker volume rm -f $(docker volume ls -f name=cap-xml --format json | jq -r .Name)
 fi
