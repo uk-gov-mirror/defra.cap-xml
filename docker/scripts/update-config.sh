@@ -3,7 +3,7 @@
 set -e
 
 CAP_XML_RDS_CONNECTION_STRING=${CAP_XML_DB_CONNECTION_STRING}
-JQ_CAP_XML_RDS_CONNECTION_STRING=$CAP_XML_RDS_CONNECTION_STRING jq '.aws.rdsConnectionString=$ENV.JQ_CAP_XML_RDS_CONNECTION_STRING' config/config.json > config/tmp-config.json
+JQ_CAP_XML_RDS_CONNECTION_STRING=$CAP_XML_RDS_CONNECTION_STRING jq '.aws.rdsConnectionString=$ENV.JQ_CAP_XML_RDS_CONNECTION_STRING' config/config.example.json > config/tmp-config.json
 mv config/tmp-config.json config/config.json
 echo Updated config/config.json - \$.aws.rdsConnectionString \($CAP_XML_RDS_CONNECTION_STRING\) allows connectivity to the provisioned local Postgres database
 CAP_XML_API_URL=http://$(awslocal apigateway get-rest-apis | jq -r ".items[0].id").execute-api.localhost.localstack.cloud:4566/local
