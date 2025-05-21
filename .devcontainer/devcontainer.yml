@@ -1,5 +1,5 @@
 services:
-  fws:
+  cap-xml:
     build:
       context: .
       dockerfile: Dockerfile
