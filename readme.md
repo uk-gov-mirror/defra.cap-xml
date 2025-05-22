@@ -30,10 +30,19 @@ This project provides CAP XML services through the use of AWS Lambda.
 
 `npm test`
 
-### Running / Debugging Lambdas Locally
+### Local Development
 
-Following Serverless V.3 reaching end of support and a decision not to [upgrade to Serverless V.4](https://wb.serverless.com/framework/docs-guides-upgrading-v4), running / debugging Lambdas is **not** supported temporarily.
-Alternative technlogies will be used to provide this functionality as soon as possible
+#### Local Development Prerequisites
+
+- Docker 28.02 or above
+- Docker Compose 2.34 or above
+
+Containerisation is used to provide developers with the ability to develop, run and debug AWS Lambda functions without reliance on deployment to AWS infrastructure. This replaces [Serverless local function invocation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local) following Serverless V.3 reaching end of support and a decision not to [upgrade to Serverless V.4](https://wb.serverless.com/framework/docs-guides-upgrading-v4).
+
+#### Local Development Options
+
+- [Local Development Quickstart Using Visual Studio Code Development Containers](docs/local-development/dev-container/setup-and-teardown.md)
+- [Configuring And Running A Local Development Environment Manually](docs/local-development/manual-configuration/setup-and-teardown.md)
 
 ## Contributing to this project
 
