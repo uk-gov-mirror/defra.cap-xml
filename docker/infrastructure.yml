@@ -29,8 +29,8 @@ services:
       # IMPORTANT
       # Named volumes ensure portability across the host plaforms used to
       # create and run development containers.
-      - pgdata:/var/lib/postgresql/data
-      - pgbootstrap:/docker-entrypoint-initdb.d
+      - capxmlpgdata:/var/lib/postgresql/data
+      - capxmlpgbootstrap:/docker-entrypoint-initdb.d
       - pgtmp:/tmp
     networks:
       ls:
@@ -40,9 +40,9 @@ services:
       timeout: 5s
       retries: 5
 volumes:
-  pgdata:
+  capxmlpgdata:
     external: true
-  pgbootstrap:
+  capxmlpgbootstrap:
     external: true
   pgtmp:
     external: true

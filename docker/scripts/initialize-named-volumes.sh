@@ -14,27 +14,27 @@ if [ `uname` = "Darwin" ]; then
   alias realpath="grealpath"
 fi
 
-PGDATA_VOLUME=$(docker volume ls -q -f "name=pgdata")
-PGADMIN_VOLUME=$(docker volume ls -q -f "name=pgadmin")
-PGBOOTSTRAP_VOLUME=$(docker volume ls -q -f "name=pgbootstrap")
-LIQUIBASE_VOLUME=$(docker volume ls -q -f "name=liquibase")
+PGDATA_VOLUME=$(docker volume ls -q -f "name=capxmlpgdata")
+PGADMIN_VOLUME=$(docker volume ls -q -f "name=capxmlpgadmin")
+PGBOOTSTRAP_VOLUME=$(docker volume ls -q -f "name=capxmlpgbootstrap")
+LIQUIBASE_VOLUME=$(docker volume ls -q -f "name=capxmlliquibase")
 
 if [ -z "$PGDATA_VOLUME" ]; then
-  docker volume create pgdata
+  docker volume create capxmlpgdata
 else
-  echo Named volume pgdata exists
+  echo Named volume capxmlpgdata exists
 fi
 
 if [ -z "$PGADMIN_VOLUME" ]; then
-  docker volume create pgadmin
+  docker volume create capxmlpgadmin
 else
-  echo Named volume pgadmin exists
+  echo Named volume capxmlpgadmin exists
 fi
 
 if [ -z "$PGBOOTSTRAP_VOLUME" ]; then
-  docker volume create pgbootstrap
+  docker volume create capxmlpgbootstrap
 else
-  echo Named volume pgbootstrap exists
+  echo Named volume capxmlpgbootstrap exists
 fi
 
 if [ -z "$PGTMP_VOLUME" ]; then
@@ -44,9 +44,9 @@ else
 fi
 
 if [ -z "$LIQUIBASE_VOLUME" ]; then
-  docker volume create liquibase
+  docker volume create capxmlliquibase
 else
-  echo Named volume liquibase exists
+  echo Named volume capxmlliquibase exists
 fi
 
 # Default to configuration required when creating a development container by cloning the remote
@@ -61,35 +61,35 @@ elif [ x"$LOCAL_CAP_XML_DIR"  != "x" ] && [ -d ${LOCAL_CAP_XML_DIR} ]; then
   CAP_XML_HOST_DIR=${LOCAL_CAP_XML_DIR}
 fi
 
-PG_TEMP_CONTAINER=$(docker ps -a -q -f "name=pgbootstraptemp")
+PG_TEMP_CONTAINER=$(docker ps -a -q -f "name=capxmlpgbootstraptemp")
 
 if [ ! -z "$PG_TEMP_CONTAINER" ]; then
-  docker rm pgbootstraptemp
-  echo Removed pgbootstraptemp container
+  docker rm capxmlpgbootstraptemp
+  echo Removed capxmlpgbootstraptemp container
 fi
 
 # Create a temporary container to load the database bootstrapping and setup scripts into named volumes
 # used by the database container.
 # https://stackoverflow.com/questions/37468788/what-is-the-right-way-to-add-data-to-an-existing-named-volume-in-docker
-docker container create --name pgbootstraptemp -v pgbootstrap:/docker-entrypoint-initdb.d -v pgtmp:/tmp alpine
-echo Created pgbootstraptemp container
-docker cp ${CAP_XML_HOST_DIR}/docker/cap-xml-db/bootstrap-cap-xml-db.sh pgbootstraptemp:/docker-entrypoint-initdb.d/bootstrap-cap-xml-db.sh
-(cd `realpath -m  ${CAP_XML_HOST_DIR}`/../cap-xml-db && docker cp ./cx/0.0.1/setup.sql pgbootstraptemp:/tmp/setup.sql)
-docker rm pgbootstraptemp
-echo Removed pgbootstraptemp container
+docker container create --name capxmlpgbootstraptemp -v capxmlpgbootstrap:/docker-entrypoint-initdb.d -v pgtmp:/tmp alpine
+echo Created capxmlpgbootstraptemp container
+docker cp ${CAP_XML_HOST_DIR}/docker/cap-xml-db/bootstrap-cap-xml-db.sh capxmlpgbootstraptemp:/docker-entrypoint-initdb.d/bootstrap-cap-xml-db.sh
+(cd `realpath -m  ${CAP_XML_HOST_DIR}`/../cap-xml-db && docker cp ./cx/0.0.1/setup.sql capxmlpgbootstraptemp:/tmp/setup.sql)
+docker rm capxmlpgbootstraptemp
+echo Removed capxmlpgbootstraptemp container
 
-LIQUIBASE_TEMP_CONTAINER=$(docker ps -a -q -f "name=liquibasetemp")
+LIQUIBASE_TEMP_CONTAINER=$(docker ps -a -q -f "name=capxmlliquibasetemp")
 
 if [ ! -z "$LIQUIBASE_TEMP_CONTAINER" ]; then
-  docker rm liquibasetemp
-  echo Removed liquibasetemp container
+  docker rm capxmlliquibasetemp
+  echo Removed capxmlliquibasetemp container
 fi
 
-# Create a temporary container to facilitate liquibase bootstrapping through a named volume
+# Create a temporary container to facilitate capxmlliquibase bootstrapping through a named volume
 # used by the Liquibase container.
 # https://stackoverflow.com/questions/37468788/what-is-the-right-way-to-add-data-to-an-existing-named-volume-in-docker
-docker container create --name liquibasetemp -v liquibase:/capxmldb alpine
-echo Created liquibasetemp container
-(cd `realpath -m ${CAP_XML_HOST_DIR}`/../cap-xml-db/cx && docker cp . liquibasetemp:/capxmldb)
-docker rm liquibasetemp
-echo Removed liquibasetemp container
+docker container create --name capxmlliquibasetemp -v capxmlliquibase:/capxmldb alpine
+echo Created capxmlliquibasetemp container
+(cd `realpath -m ${CAP_XML_HOST_DIR}`/../cap-xml-db/cx && docker cp . capxmlliquibasetemp:/capxmldb)
+docker rm capxmlliquibasetemp
+echo Removed capxmlliquibasetemp container
