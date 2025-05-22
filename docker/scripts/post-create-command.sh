@@ -15,5 +15,5 @@ if [ -d /opt/workspaces/cap-xml/docker ]; then
   sudo chown -R vscode:vscode /opt/workspaces/cap-xml/docker
 fi
 
-docker rm docker-capxmlliquibase-1
+docker rm docker-liquibase-1
 docker image prune -f
