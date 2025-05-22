@@ -59,4 +59,4 @@ Ensure that the [local cap-xml repository location](../dev-container/local-repos
 
 ### Unsuccessful Resolution Of Problems
 
-If problems persist, prerequisites and associated configuration should be reviewed followed by a [teardown](../common/teardown.md) and rebuild of the containerised development environment. If LocalStack resources for other projects are present (such as for [fws-api](https://github.com/DEFRA/fws-api)  try removing these resources before rebuilding to eliminate potential conflicts.
+If problems persist, prerequisites and associated configuration should be reviewed followed by a [teardown](../common/teardown.md) and rebuild of the containerised development environment. If LocalStack resources for other projects are present (for example [fws-api](https://github.com/DEFRA/fws-api)), try removing these resources before rebuilding to eliminate potential conflicts.
