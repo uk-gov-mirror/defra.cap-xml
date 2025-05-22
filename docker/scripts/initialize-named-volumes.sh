@@ -38,9 +38,9 @@ else
 fi
 
 if [ -z "$PGTMP_VOLUME" ]; then
-  docker volume create pgtmp
+  docker volume create capxmlpgtmp
 else
-  echo Named volume pgtmp exists
+  echo Named volume capxmlpgtmp exists
 fi
 
 if [ -z "$LIQUIBASE_VOLUME" ]; then
@@ -71,7 +71,7 @@ fi
 # Create a temporary container to load the database bootstrapping and setup scripts into named volumes
 # used by the database container.
 # https://stackoverflow.com/questions/37468788/what-is-the-right-way-to-add-data-to-an-existing-named-volume-in-docker
-docker container create --name capxmlpgbootstraptemp -v capxmlpgbootstrap:/docker-entrypoint-initdb.d -v pgtmp:/tmp alpine
+docker container create --name capxmlpgbootstraptemp -v capxmlpgbootstrap:/docker-entrypoint-initdb.d -v capxmlpgtmp:/tmp alpine
 echo Created capxmlpgbootstraptemp container
 docker cp ${CAP_XML_HOST_DIR}/docker/cap-xml-db/bootstrap-cap-xml-db.sh capxmlpgbootstraptemp:/docker-entrypoint-initdb.d/bootstrap-cap-xml-db.sh
 (cd `realpath -m  ${CAP_XML_HOST_DIR}`/../cap-xml-db && docker cp ./cx/0.0.1/setup.sql capxmlpgbootstraptemp:/tmp/setup.sql)

@@ -31,7 +31,7 @@ services:
       # create and run development containers.
       - capxmlpgdata:/var/lib/postgresql/data
       - capxmlpgbootstrap:/docker-entrypoint-initdb.d
-      - pgtmp:/tmp
+      - capxmlpgtmp:/tmp
     networks:
       ls:
     healthcheck:
@@ -44,5 +44,5 @@ volumes:
     external: true
   capxmlpgbootstrap:
     external: true
-  pgtmp:
+  capxmlpgtmp:
     external: true
