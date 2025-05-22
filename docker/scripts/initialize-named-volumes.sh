@@ -85,7 +85,7 @@ if [ ! -z "$LIQUIBASE_TEMP_CONTAINER" ]; then
   echo Removed capxmlliquibasetemp container
 fi
 
-# Create a temporary container to facilitate capxmlliquibase bootstrapping through a named volume
+# Create a temporary container to facilitate liquibase bootstrapping through a named volume
 # used by the Liquibase container.
 # https://stackoverflow.com/questions/37468788/what-is-the-right-way-to-add-data-to-an-existing-named-volume-in-docker
 docker container create --name capxmlliquibasetemp -v capxmlliquibase:/capxmldb alpine
