@@ -140,4 +140,4 @@ environment variable within [the  Docker environment variable file](../../../doc
 
 * Calls to the **getMessagesAtom** and **getMessage** LocalStack API Gateway endpoints return a Content-Type HTTP response header of **text/plain** rather than **application/xml** returned by calls to AWS API Gateway endpoints. This affects markup formatting in browsers.
 * When running/debugging in a development container created by cloning the repository into a container volume, calls to  **getMessagesAtom** return XML content containing incorrect URLs that use the REST API ID configured on the host machine rather than the REST API ID configured in the development container.
-  * To workaround this the REST API ID in these URLs needs to be corrected manually before use.
+  * To workaround this issue, ensure that the url attribute within config/config.json on the host machine matches that configured in the development container.
