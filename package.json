@@ -9,8 +9,7 @@
   "scripts": {
     "deploy": "npm run validate-config && sls deploy --verbose --force",
     "lint": "standard",
-    "unit-test": "lab test -v -c --coverage-exclude lib/helpers -r console -o stdout -r lcov -o coverage/lcov.info -m 5000",
-    "test-config": "bin/create-test-config",
+    "unit-test": "lab test -v -c -r console -o stdout -r lcov -o coverage/lcov.info -m 5000",
     "test": "npm run lint && npm run unit-test",
     "validate-config": "node ./config/index.js"
   },
@@ -27,6 +26,8 @@
   "devDependencies": {
     "@hapi/code": "^9.0.3",
     "@hapi/lab": "^25.3.1",
+    "proxyquire": "^2.1.3",
+    "sinon": "^20.0.0",
     "standard": "17.1.2"
   }
 }
