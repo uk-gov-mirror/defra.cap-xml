@@ -31,7 +31,6 @@ main() {
     --stage-name local
 
   echo "Created API Gateway deployment"
-  echo Function URL for archiveMessages is $(awslocal lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
 }
 
 get_http_method() {

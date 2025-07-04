@@ -4,14 +4,16 @@
 set -e
 
 lambda_functions_dir="lib/functions"
+deployed_cpx_agw_url=http://$(awslocal apigateway get-rest-apis | jq -r ".items[0].id").execute-api.localhost.localstack.cloud:4566/local
 
 # Prepare a comma separated list of custom environment variables required by
 # each Lambda function.
-cap_xml_db_username=$(echo CAP_XML_DB_USERNAME=$CAP_XML_DB_USERNAME)
-cap_xml_db_password=$(echo CAP_XML_DB_PASSWORD=$CAP_XML_DB_PASSWORD)
-cap_xml_db_name=$(echo CAP_XML_DB_NAME=$CAP_XML_DB_NAME)
-cap_xml_db_host=$(echo CAP_XML_DB_HOST=$CAP_XML_DB_HOST)
-set -- $cap_xml_db_username $cap_xml_db_password $cap_xml_db_name $cap_xml_db_host
+cpx_db_username=$(echo CPX_DB_USERNAME=$CPX_DB_USERNAME)
+cpx_db_password=$(echo CPX_DB_PASSWORD=$CPX_DB_PASSWORD)
+cpx_db_name=$(echo CPX_DB_NAME=$CPX_DB_NAME)
+cpx_db_host=$(echo CPX_DB_HOST=$CPX_DB_HOST)
+cpx_agw_url=$(echo CPX_AGW_URL=$deployed_cpx_agw_url)
+set -- $cpx_db_username $cpx_db_password $cpx_db_name $cpx_db_host $cpx_agw_url
 custom_environment_variables=$(printf '%s,' "$@" | sed 's/,*$//g')
 
 # Iterate over each file in lambda_functions_dir
@@ -39,3 +41,7 @@ echo "All Lambda functions have been registered with LocalStack."
 awslocal lambda create-function-url-config --function-name archiveMessages --auth-type NONE
 
 echo "Created function URL config for archiveMessages function"
+
+echo Function URL for archiveMessages is $(awslocal lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
+echo  API Gateway root URL is http://$(awslocal apigateway get-rest-apis | jq -r ".items[0].id").execute-api.localhost.localstack.cloud:4566/local
+

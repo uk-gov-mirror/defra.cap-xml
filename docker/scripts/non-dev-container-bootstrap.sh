@@ -10,7 +10,8 @@ set +a
 
 docker/scripts/initialize-command.sh
 docker compose -f docker/infrastructure.yml -f docker/networks.yml -f docker/dev-tools.yml up -d
-docker/scripts/register-lambda-functions.sh
+# Register the API Gateway before the Lambda functions so that the API Gateway URL can be
+# made available to each Lambda function using an environment variable.
 docker/scripts/register-api-gateway.sh
-docker/scripts/update-config.sh
+docker/scripts/register-lambda-functions.sh
 docker rm docker-liquibase-1
