@@ -147,6 +147,7 @@ put_method_response_for_http_200_status_code() {
        --resource-id $resource_id \
        --http-method $http_method \
        --status-code 200 \
+       --response-parameters '{"method.response.header.content-type": true}' \
        --response-models '{"application/xml": "Empty"}'
     ;;
     processMessage)
