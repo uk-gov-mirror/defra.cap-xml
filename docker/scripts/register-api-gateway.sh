@@ -173,7 +173,7 @@ put_responses_for_get_message() {
     --http-method $http_method \
     --status-code 404 \
     --selection-pattern 'No message found' \
-    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
+    --response-parameters '{"method.response.header.content-type": "integration.response.header.content-type"}' \
     --response-templates  '{"application/json": "{\"errorMessage\": $input.json(\"$.errorMessage\")}"}'
 
   put_integration_response_for_http_500
@@ -204,7 +204,7 @@ put_responses_for_http_200_get() {
     --resource-id $resource_id \
     --http-method $http_method \
     --status-code 200 \
-    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
+    --response-parameters '{"method.response.header.content-type": "integration.response.body.headers.content-type"}' \
     --response-templates '{"application/xml" : "#set($inputRoot = $input.path(\"$\"))\n$inputRoot.body"}'
 }
 
@@ -215,7 +215,7 @@ put_integration_response_for_http_500() {
     --resource-id $resource_id \
     --http-method $http_method \
     --status-code 500 \
-    --response-parameters '{"method.response.header.Content-Type": "integration.response.header.Content-Type"}' \
+    --response-parameters '{"method.response.header.content-type": "integration.response.body.headers.content-type"}' \
     --response-templates '{"application/json": "{\"errorMessage\": $input.json(\"$.errorMessage\")}"}' \
     --selection-pattern '(\n|.)+'
 }

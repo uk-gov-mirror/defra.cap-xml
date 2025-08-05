@@ -8,3 +8,6 @@ config/config.json
 lcov.info
 
 docker/.volume
+
+coverage
+.aws-sam

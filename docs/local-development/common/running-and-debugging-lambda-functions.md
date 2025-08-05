@@ -56,6 +56,14 @@ In the following examples of invoking Lambda functions through API Gateway endpo
 * When the debugger attaches, it breaks before running the AWS Lambda function. As such, debugging **must** be resumed to reach
   configured breakpoints.
 
+### Loading dummy data
+
+There is a helper script to upload 10 dummy messages to the development environment. This can be executed after the local development environment has been bootstrapped.
+
+```sh
+npm run load-dummy-data
+```
+
 ### Making A HTTP GET Request To The /messages.atom Endpoint
 
 Use the REST API identifier to call the **/messages.atom** endpoint linked to the **getMessagesAtom** AWS Lambda function. For example, the following curl command can be used:
