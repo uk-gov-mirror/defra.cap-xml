@@ -227,7 +227,7 @@
                         </restriction>
                       </simpleType>
                     </element>
-                    <element name="polygon">
+                    <element name="polygon" maxOccurs="unbounded">
                       <simpleType>
                         <restriction base="xs:string">
                           <minLength value="1"/>
