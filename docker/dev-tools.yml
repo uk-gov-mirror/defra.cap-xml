@@ -27,7 +27,11 @@ services:
       - capxmlliquibase:/capxmldb
     networks:
       ls:
-    command: update
+    command: /bin/sh -c "lpm add postgresql && liquibase update"
+    # command: /bin/sh -c "lpm add postgresql && tail -f /dev/null"
+    # entrypoint: ["tail", "-f", "/dev/null"]
+    # tty: true
+    # stdin_open: true
 volumes:
   capxmlpgadmin:
     external: true

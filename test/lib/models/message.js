@@ -36,10 +36,11 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 </alert>`
 
 lab.experiment('Message class', () => {
-  let message
+  let message, messageV2
 
   lab.beforeEach(() => {
     message = new Message(xml)
+    messageV2 = new Message(xml)
   })
 
   lab.test('parses identifier', () => {
@@ -119,8 +120,9 @@ lab.experiment('Message class', () => {
   })
 
   lab.test('putQuery generates SQL insert with correct values', () => {
-    const sql = message.putQuery()
-    Code.expect(sql.text).to.equal('INSERT INTO "messages" ("identifier", "msg_type", "references", "alert", "fwis_code", "expires", "sent", "created") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)')
+    const sql = message.putQuery(message, messageV2)
+    Code.expect(sql.text).to.equal('INSERT INTO "messages" ("identifier", "msg_type", "references", "alert", "fwis_code", "expires", "sent", "created", "identifier_v2", "references_v2", "alert_v2") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)')
+    // need to test for more values and v2 values here
     Code.expect(sql.values).to.include('123456')
     Code.expect(sql.values).to.include('TESTAREA')
     Code.expect(sql.values).to.include('2026-05-29T11:00:02-00:00')
