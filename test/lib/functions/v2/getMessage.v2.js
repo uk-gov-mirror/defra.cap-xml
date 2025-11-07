@@ -25,7 +25,7 @@ lab.experiment('getMessage v2', () => {
     service.getMessage = (query, params) => Promise.resolve({
       rows: [{
         getmessage: {
-          alert: '<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">test</alert>'
+          alert_v2: '<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">test</alert>'
         }
       }]
     })
@@ -122,7 +122,7 @@ lab.experiment('getMessage v2', () => {
       service.getMessage = () => Promise.resolve({
         rows: [{
           getmessage: {
-            alert: getMessageXmlInvalid
+            alert_v2: getMessageXmlInvalid
           }
         }]
       })
@@ -144,7 +144,7 @@ lab.experiment('getMessage v2', () => {
       service.getMessage = () => Promise.resolve({
         rows: [{
           getmessage: {
-            alert: getMessageXmlValid
+            alert_v2: getMessageXmlValid
           }
         }]
       })

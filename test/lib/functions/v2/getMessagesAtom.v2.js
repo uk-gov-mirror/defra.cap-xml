@@ -38,7 +38,7 @@ lab.experiment('getMessagesAtom v2', () => {
     Code.expect(ret.statusCode).to.equal(200)
     Code.expect(ret.headers['content-type']).to.equal('application/xml')
     Code.expect(ret.body).to.contain('<id>http://localhost:3000/v2/messages.atom</id>')
-    Code.expect(ret.body).to.contain('<id>http://localhost:3000/v2/message/2.49.0.0.826.1.YYYYMMDDHHMMSS.4eb3b7350ab7aa443650fc9351f</id>')
+    Code.expect(ret.body).to.contain('<id>http://localhost:3000/v2/message/4eb3b7350ab7aa443650fc9351f</id>')
   })
 
   lab.test('Bad rows returned', async () => {
