@@ -22,6 +22,9 @@ main() {
       v[0-9]*)
         lambda_function_name="${lambda_function_name}_${dir_prefix}"
         ;;
+      *)
+        echo "No version prefix"
+        ;;
     esac
 
     if [ $lambda_function_name = "archiveMessages" ]; then
@@ -63,6 +66,7 @@ register_api_gateway_support_for_get_message_v2() {
   get_message_v2_resource_id=$(create_resource $v2_resource_id  "message")
   message_v2_resource_id=$(create_resource $get_message_v2_resource_id  "{id}")
   put_method_and_integration $message_v2_resource_id
+  return 0
 }
 
 register_api_gateway_support_for_get_messages_atom() {
@@ -76,6 +80,7 @@ register_api_gateway_support_for_get_messages_atom_v2() {
   fi
   get_messages_atom_v2_resource_id=$(create_resource $v2_resource_id  "messages.atom")
   put_method_and_integration $get_messages_atom_v2_resource_id
+  return 0
 }
 
 register_api_gateway_support_for_process_message() {

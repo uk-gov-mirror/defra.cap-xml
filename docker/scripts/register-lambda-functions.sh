@@ -30,6 +30,9 @@ find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_functio
           handler_path="lib/functions/$dir_prefix/$function_name.$function_name"
           function_name="${function_name}_${dir_prefix}"
           ;;
+        *)
+          echo "No version prefix"
+          ;;
       esac
 
       echo Registering $function_name with LocalStack
