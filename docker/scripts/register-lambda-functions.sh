@@ -4,7 +4,7 @@
 set -e
 
 lambda_functions_dir="lib/functions"
-deployed_cpx_agw_url=http://$(awslocal apigateway get-rest-apis | jq -r ".items[0].id").execute-api.localhost.localstack.cloud:4566/local
+deployed_cpx_agw_url=http://localhost:4566/restapis/$(awslocal apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
 
 # Prepare a comma separated list of custom environment variables required by
 # each Lambda function.
@@ -23,6 +23,9 @@ cpx_meteoalarm_disable=$(echo CPX_METEOALARM_DISABLE=$CPX_METEOALARM_DISABLE)
 node_tls_reject_unauthorized=$(echo NODE_TLS_REJECT_UNAUTHORIZED=$NODE_TLS_REJECT_UNAUTHORIZED)
 set -- $cpx_db_username $cpx_db_password $cpx_db_name $cpx_db_host $cpx_agw_url $cpx_redis_host $cpx_redis_port $cpx_redis_tls $cpx_meteoalarm_api_url $cpx_meteoalarm_api_username $cpx_meteoalarm_api_password $node_tls_reject_unauthorized $cpx_meteoalarm_disable
 custom_environment_variables=$(printf '%s,' "$@" | sed 's/,*$//g')
+
+# Create the hot-reload bucket so Floci can serve Lambda code from the local filesystem.
+awslocal s3 mb s3://hot-reload 2>/dev/null || true
 
 # Iterate over each file in lambda_functions_dir
 find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_function; do
@@ -43,7 +46,7 @@ find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_functio
           ;;
       esac
 
-      echo Registering $function_name with LocalStack
+      echo Registering $function_name with Floci
 
       awslocal lambda create-function \
         --function-name "$function_name" \
@@ -59,12 +62,12 @@ find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_functio
   fi
 done
 
-echo "All Lambda functions have been registered with LocalStack."
+echo "All Lambda functions have been registered with Floci."
 
 awslocal lambda create-function-url-config --function-name archiveMessages --auth-type NONE
 
 echo "Created function URL config for archiveMessages function"
 
 echo Function URL for archiveMessages is $(awslocal lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
-echo  API Gateway root URL is http://$(awslocal apigateway get-rest-apis | jq -r ".items[0].id").execute-api.localhost.localstack.cloud:4566/local
+echo  API Gateway base URL is http://localhost:4566/restapis/$(awslocal apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
 

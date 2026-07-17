@@ -6,8 +6,9 @@ set -e
 main() {
   # Reference - https://docs.localstack.cloud/user-guide/aws/apigateway/
   echo "Creating API Gateway"
+  echo $AWS_ENDPOINT_URL
 
-  cap_xml_rest_api_id=$(awslocal apigateway create-rest-api --name "FWS API Gateway" | jq -r '.id')
+  cap_xml_rest_api_id=$(awslocal apigateway create-rest-api --name "CPX API Gateway" | jq -r '.id')
   cap_xml_rest_api_root_resource_id=$(awslocal apigateway get-resources --rest-api-id $cap_xml_rest_api_id | jq -r '.items[0].id')
   lambda_functions_dir="lib/functions"
 
@@ -37,9 +38,13 @@ main() {
 
   done
 
-  awslocal apigateway create-deployment \
-    --rest-api-id $cap_xml_rest_api_id \
-    --stage-name local
+  deployment_id=$(awslocal apigateway create-deployment \
+      --rest-api-id $cap_xml_rest_api_id | jq -r '.id')
+
+  awslocal apigateway create-stage \
+      --rest-api-id $cap_xml_rest_api_id \
+      --stage-name local \
+      --deployment-id $deployment_id
 
   echo "Created API Gateway deployment"
   return 0
