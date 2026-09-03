@@ -1,8 +1,35 @@
+# Title
+[BUG] apigateway --type AWS putIntegration endpoint invocation fails
+
+## Service
+
+API Gateway
+
+## AWS API Action
+
+PutIntegration / execute-api (invoke)
+
+## Expected behavior
+
+When an API Gateway REST API method is configured with `--type AWS` and a Lambda integration URI (`arn:aws:apigateway:{region}:lambda:path/2015-03-31/functions/{fnArn}/invocations`), invoking the endpoint should execute the Lambda function with the VTL-rendered request template as the payload and return the response after applying any configured VTL response template mappings.
+
+This is the standard non-proxy Lambda integration pattern - it provides full request/response VTL mapping, unlike `AWS_PROXY` which bypasses it.
+
+## Actual behaviour
+
+Invoking the endpoint returns a 500:
+
+`{"message": "The request must contain the parameter Action"}`
+
+Floci incorrectly treats the Lambda path-style URI (`lambda:path/...`) as a query-protocol (form-urlencoded) integration. It attempts to parse the VTL-rendered Lambda payload as AWS query protocol and dispatch it through invokeQuery, which fails because the body contains no `Action` parameter.
+
+`AWS_PROXY` integrations against the same Lambda function work correctly.
+
+## Reproduction
+
+```
 #!/usr/bin/env bash
 set -euo pipefail
-
-# docker compose -f ../../docker/infrastructure.yml -f ../../docker/networks.yml up floci -d
-
 
 export AWS_ENDPOINT_URL=http://localhost:4566
 export AWS_PAGER=""
@@ -131,3 +158,10 @@ echo ""
 # Call the deployed API
 # Invoke — returns 500 with "The request must contain the parameter Action" (Floci bug)
 curl http://localhost:4566/restapis/$API_ID/dev/_user_request_/users
+```
+
+## Environment
+
+- Floci version / image tag: latest
+- Java SDK version (if applicable): AWS CLI v2
+- How you're running Floci (Docker / native / mvn quarkus:dev): Docker

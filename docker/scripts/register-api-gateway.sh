@@ -101,6 +101,19 @@ register_api_gateway_support_for_process_message() {
 create_resource() {
   cap_xml_rest_api_root_resource_id=$1
   cap_xml_rest_api_path_part=$2
+
+  # A resource with the same parent and path part may already have been created
+  # by another lambda function (e.g. GET /message/{id} and POST /message share /message).
+  existing_resource_id=$(awslocal apigateway get-resources \
+    --rest-api-id $cap_xml_rest_api_id \
+    | jq -r --arg parent "$cap_xml_rest_api_root_resource_id" --arg path "$cap_xml_rest_api_path_part" \
+      '.items[] | select(.parentId == $parent and .pathPart == $path) | .id')
+
+  if [ -n "$existing_resource_id" ]; then
+    echo $existing_resource_id
+    return 0
+  fi
+
   echo $(awslocal apigateway create-resource \
     --rest-api-id $cap_xml_rest_api_id \
     --parent-id $cap_xml_rest_api_root_resource_id \
