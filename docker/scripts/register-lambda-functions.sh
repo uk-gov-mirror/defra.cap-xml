@@ -3,8 +3,10 @@
 # See https://containers.dev/implementors/json_reference/.
 set -e
 
+. docker/scripts/set-local-aws-environment.sh
+
 lambda_functions_dir="lib/functions"
-deployed_cpx_agw_url=http://localhost:4566/restapis/$(aws apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
+deployed_cpx_agw_url=http://localhost:4566/restapis/$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
 
 # Prepare a comma separated list of custom environment variables required by
 # each Lambda function.
@@ -25,7 +27,7 @@ set -- $cpx_db_username $cpx_db_password $cpx_db_name $cpx_db_host $cpx_agw_url 
 custom_environment_variables=$(printf '%s,' "$@" | sed 's/,*$//g')
 
 # Create the hot-reload bucket so Floci can serve Lambda code from the local filesystem.
-aws s3 mb s3://hot-reload 2>/dev/null || true
+aws --endpoint-url "$AWS_ENDPOINT_URL" s3 mb s3://hot-reload 2>/dev/null || true
 
 # Iterate over each file in lambda_functions_dir
 find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_function; do
@@ -48,7 +50,7 @@ find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_functio
 
       echo Registering $function_name with Floci
 
-      aws lambda create-function \
+      aws --endpoint-url "$AWS_ENDPOINT_URL" lambda create-function \
         --function-name "$function_name" \
         --code S3Bucket="hot-reload",S3Key="$(pwd)/" \
         --runtime nodejs${NODEJS_VERSION}.x \
@@ -64,10 +66,10 @@ done
 
 echo "All Lambda functions have been registered with Floci."
 
-aws lambda create-function-url-config --function-name archiveMessages --auth-type NONE
+aws --endpoint-url "$AWS_ENDPOINT_URL" lambda create-function-url-config --function-name archiveMessages --auth-type NONE
 
 echo "Created function URL config for archiveMessages function"
 
-echo Function URL for archiveMessages is $(aws lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
-echo  API Gateway base URL is http://localhost:4566/restapis/$(aws apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
+echo Function URL for archiveMessages is $(aws --endpoint-url "$AWS_ENDPOINT_URL" lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
+echo  API Gateway base URL is http://localhost:4566/restapis/$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
 
