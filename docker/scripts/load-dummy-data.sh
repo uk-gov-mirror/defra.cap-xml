@@ -8,7 +8,7 @@ set -e
 BASE_GUID="4eb3b7350ab7aa443650fc9351f02940E"
 BASE_AREA="TESTAREA"
 DATA_FILE="test/lib/functions/data/nws-alert.xml"
-LAMBDA_URL=http://localhost:4566/restapis/$(awslocal apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_/message
+LAMBDA_URL=http://localhost:4566/restapis/$(aws apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_/message
 
 # Calculate tomorrow's date
 TOMORROW=$(date -u -d "+1 day" +"%Y-%m-%dT%H:%M:%S+00:00")

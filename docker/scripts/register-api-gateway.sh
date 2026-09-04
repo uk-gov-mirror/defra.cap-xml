@@ -4,12 +4,12 @@
 set -e
 
 main() {
-  # Reference - https://docs.localstack.cloud/user-guide/aws/apigateway/
+  # Reference - https://docs.aws.amazon.com/cli/latest/reference/apigateway/
   echo "Creating API Gateway"
   echo $AWS_ENDPOINT_URL
 
-  cap_xml_rest_api_id=$(awslocal apigateway create-rest-api --name "CPX API Gateway" | jq -r '.id')
-  cap_xml_rest_api_root_resource_id=$(awslocal apigateway get-resources --rest-api-id $cap_xml_rest_api_id | jq -r '.items[0].id')
+  cap_xml_rest_api_id=$(aws apigateway create-rest-api --name "CPX API Gateway" | jq -r '.id')
+  cap_xml_rest_api_root_resource_id=$(aws apigateway get-resources --rest-api-id $cap_xml_rest_api_id | jq -r '.items[0].id')
   lambda_functions_dir="lib/functions"
 
   find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_function; do
@@ -38,10 +38,10 @@ main() {
 
   done
 
-  deployment_id=$(awslocal apigateway create-deployment \
+  deployment_id=$(aws apigateway create-deployment \
       --rest-api-id $cap_xml_rest_api_id | jq -r '.id')
 
-  awslocal apigateway create-stage \
+  aws apigateway create-stage \
       --rest-api-id $cap_xml_rest_api_id \
       --stage-name local \
       --deployment-id $deployment_id
@@ -104,7 +104,7 @@ create_resource() {
 
   # A resource with the same parent and path part may already have been created
   # by another lambda function (e.g. GET /message/{id} and POST /message share /message).
-  existing_resource_id=$(awslocal apigateway get-resources \
+  existing_resource_id=$(aws apigateway get-resources \
     --rest-api-id $cap_xml_rest_api_id \
     | jq -r --arg parent "$cap_xml_rest_api_root_resource_id" --arg path "$cap_xml_rest_api_path_part" \
       '.items[] | select(.parentId == $parent and .pathPart == $path) | .id')
@@ -114,7 +114,7 @@ create_resource() {
     return 0
   fi
 
-  echo $(awslocal apigateway create-resource \
+  echo $(aws apigateway create-resource \
     --rest-api-id $cap_xml_rest_api_id \
     --parent-id $cap_xml_rest_api_root_resource_id \
     --path-part $cap_xml_rest_api_path_part | jq -r '.id')
@@ -124,7 +124,7 @@ create_resource() {
 put_method_and_integration() {
   resource_id=$1
 
-  awslocal apigateway put-method \
+  aws apigateway put-method \
       --rest-api-id $cap_xml_rest_api_id \
       --resource-id $resource_id \
       --http-method $http_method \
@@ -149,7 +149,7 @@ put_integration() {
 
   case $lambda_function_name in
     getMessage|getMessage_v2)
-      awslocal apigateway put-integration \
+      aws apigateway put-integration \
         --rest-api-id $cap_xml_rest_api_id \
         --resource-id $resource_id \
         --http-method $http_method \
@@ -163,7 +163,7 @@ put_integration() {
       put_responses_for_get_message
       ;;
     getMessagesAtom|getMessagesAtom_v2)
-      awslocal apigateway put-integration \
+      aws apigateway put-integration \
         --rest-api-id $cap_xml_rest_api_id \
         --resource-id $resource_id \
         --http-method $http_method \
@@ -176,7 +176,7 @@ put_integration() {
       put_responses_for_get_messages_atom
       ;;
     processMessage)
-      awslocal apigateway put-integration \
+      aws apigateway put-integration \
         --rest-api-id $cap_xml_rest_api_id \
         --resource-id $resource_id \
         --http-method $http_method \
@@ -206,7 +206,7 @@ put_method_response_for_http_200_status_code() {
   # by a function. This results in some duplication.
   case $lambda_function_name in
     getMessage|getMessagesAtom)
-      awslocal apigateway put-method-response \
+      aws apigateway put-method-response \
         --rest-api-id $cap_xml_rest_api_id \
         --resource-id $resource_id \
         --http-method $http_method \
@@ -214,7 +214,7 @@ put_method_response_for_http_200_status_code() {
         --response-models '{"application/xml": "Empty"}'
       ;;
     processMessage)
-      awslocal apigateway put-method-response \
+      aws apigateway put-method-response \
         --rest-api-id $cap_xml_rest_api_id \
         --resource-id $resource_id \
         --http-method $http_method \
@@ -235,7 +235,7 @@ put_responses_for_get_message() {
 
   put_responses_for_http_200_get
 
-  awslocal apigateway put-integration-response \
+  aws apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
     --resource-id $resource_id \
     --http-method $http_method \
@@ -255,7 +255,7 @@ put_responses_for_get_messages_atom() {
 }
 
 put_responses_for_process_message() {
-  awslocal apigateway put-integration-response \
+  aws apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
     --resource-id $resource_id \
     --http-method $http_method \
@@ -270,7 +270,7 @@ put_responses_for_http_200_get() {
 
   put_method_response_for_http_200_status_code
 
-  awslocal apigateway put-integration-response \
+  aws apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
     --resource-id $resource_id \
     --http-method $http_method \
@@ -282,7 +282,7 @@ put_responses_for_http_200_get() {
 
 put_integration_response_for_http_500() {
 
-  awslocal apigateway put-integration-response \
+  aws apigateway put-integration-response \
     --rest-api-id $cap_xml_rest_api_id \
     --resource-id $resource_id \
     --http-method $http_method \
