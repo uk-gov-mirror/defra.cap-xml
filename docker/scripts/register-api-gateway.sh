@@ -11,7 +11,7 @@ main() {
   echo $AWS_ENDPOINT_URL
 
   cap_xml_rest_api_id=$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway create-rest-api --name "CPX API Gateway" | jq -r '.id')
-  cap_xml_rest_api_root_resource_id=$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-resources --rest-api-id $cap_xml_rest_api_id | jq -r '.items[0].id')
+  cap_xml_rest_api_root_resource_id=$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-resources --rest-api-id "$cap_xml_rest_api_id" | jq -r '.items[] | select(.path == "/") | .id')
   lambda_functions_dir="lib/functions"
 
   find "$lambda_functions_dir" -type f -name "*.js" | while read -r lambda_function; do
