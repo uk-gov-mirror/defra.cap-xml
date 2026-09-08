@@ -6,7 +6,7 @@ set -e
 . docker/scripts/set-local-aws-environment.sh
 
 lambda_functions_dir="lib/functions"
-deployed_cpx_agw_url=http://localhost:4566/restapis/$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
+deployed_cpx_agw_url="$AWS_ENDPOINT_URL/restapis/$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-rest-apis --query "items[?name=='CPX API Gateway'].id | [0]" --output text)/local/_user_request_"
 
 # Prepare a comma separated list of custom environment variables required by
 # each Lambda function.
