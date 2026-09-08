@@ -71,5 +71,5 @@ aws --endpoint-url "$AWS_ENDPOINT_URL" lambda create-function-url-config --funct
 echo "Created function URL config for archiveMessages function"
 
 echo Function URL for archiveMessages is $(aws --endpoint-url "$AWS_ENDPOINT_URL" lambda get-function-url-config --function-name archiveMessages | jq -r .FunctionUrl)
-echo  API Gateway base URL is http://localhost:4566/restapis/$(aws --endpoint-url "$AWS_ENDPOINT_URL" apigateway get-rest-apis | jq -r ".items[0].id")/local/_user_request_
+echo  API Gateway base URL is $deployed_cpx_agw_url
 
